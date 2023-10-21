@@ -4,26 +4,33 @@
 
   $: data = [];
 
-  const socket = io("ws://2dvkjqkl-3000.euw.devtunnels.ms");
+  const socket = io("wss://2dvkjqkl-3000.euw.devtunnels.ms");
 
   socket.on("update", (receivedData: any) => {	
 		//@ts-ignore
     data = [...data, receivedData];
   });
 
-  onMount(async () => {
-    try {
+
+	const getTranscript = async  () => {
+		try {
       const response = await fetch(
-        "https://2dvkjqkl-3000.euw.devtunnels.ms/transcribe"
-      ); // Replace with your API endpoint
+        "https://2dvkjqkl-3000.euw.devtunnels.ms/full-transcript"
+      );			
       if (response.ok) {
         data = await response.json();
       } else {
-        throw new Error("Failed to fetch data");
+        throw new Error("Failed to fetch transcriptions");
       }
     } catch (error) {
       console.error(error);
     }
+	}
+
+	
+
+  onMount(async () => {    
+		getTranscript();
   });
 </script>
 
@@ -32,7 +39,7 @@
     {#if data}
       <div>
         {#each data as item (item.id)}
-          <p>[{item.timestamp}] {item.original} -> {item.translated}</p>
+          <p>[{item.name}: {item.timestamp}] ({item.sourceLang}){item.original} -> ({item.targetLang}){item.translated}</p>
           <br />
         {/each}
       </div>
