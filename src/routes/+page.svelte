@@ -32,26 +32,29 @@
     }
   };
 
-  function updateItem (item) {
-		console.log(item);
+  function updateItem(item) {
+    console.log(item);
     try {
-     fetch(
-        `https://2dvkjqkl-3000.euw.devtunnels.ms/transcribe/${item.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            translated: item.translated,
-            original: item.original,
-          }),
-        }
-      );
+      fetch(`https://2dvkjqkl-3000.euw.devtunnels.ms/transcribe/${item.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          translated: item.translated,
+          original: item.original,
+        }),
+      });
     } catch (e) {
       console.log(e);
     }
-  };
+  }
+
+  function scrollToBottom() {
+    const page = document.getElementById("page");
+    page.scrollTo(0, page?.scrollHeight || 0);
+    setTimeout(scrollToBottom, 500);
+  }
 
   onMount(async () => {
     await getTranscript();
@@ -59,6 +62,7 @@
       head: ["name", "original", "translated"],
       body: tableMapperValues(data, ["name", "original", "translated"]),
     };
+		scrollToBottom();
   });
 </script>
 
