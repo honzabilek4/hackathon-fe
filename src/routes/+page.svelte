@@ -15,11 +15,7 @@
   socket.on("update", (receivedData: any) => {
     //@ts-ignore
     data = [...data, receivedData];
-  });
-
-	// socket.on("edit",(val)=>{	
-	// 	console.log(data)
-	// })
+  });	
 
   const getTranscript = async () => {
     try {
