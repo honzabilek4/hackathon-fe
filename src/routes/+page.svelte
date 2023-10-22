@@ -2,8 +2,8 @@
   import { onMount } from "svelte";
   import io from "socket.io-client";
   // import { Table } from "@skeletonlabs/skeleton";
-	import InPlaceEdit from '../components/InPlaceEdit.svelte';
-  import { tableMapperValues } from "@skeletonlabs/skeleton";
+  import InPlaceEdit from "../components/InPlaceEdit.svelte";
+  import { RadioItem, tableMapperValues } from "@skeletonlabs/skeleton";
   import type { TableSource } from "@skeletonlabs/skeleton";
 
   $: data = [];
@@ -23,12 +23,33 @@
         "https://2dvkjqkl-3000.euw.devtunnels.ms/full-transcript"
       );
       if (response.ok) {
-        data = await response.json();				
+        data = await response.json();
       } else {
         throw new Error("Failed to fetch transcriptions");
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  function updateItem (item) {
+		console.log(item);
+    try {
+     fetch(
+        `https://2dvkjqkl-3000.euw.devtunnels.ms/transcribe/${item.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            translated: item.translated,
+            original: item.original,
+          }),
+        }
+      );
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -51,14 +72,17 @@
       {#if data}
         <div>
           {#each data as item (item.id)}
-					<p>
-
-						[{item.name}: {item.timestamp}]  
-						<InPlaceEdit class="w-full" bind:value={item.original}/>
-						--- 
-						<InPlaceEdit class="w-full" bind:value={item.translated}/>
-            <br />
-					</p>            
+            <p>
+              [{item.name}: {item.timestamp}]
+              <InPlaceEdit
+                class="w-full"
+                bind:value={item.original}
+                on:submit={() => updateItem(item)}
+              />
+              ---
+              <InPlaceEdit class="w-full" bind:value={item.translated} />
+              <br />
+            </p>
           {/each}
         </div>
       {:else}

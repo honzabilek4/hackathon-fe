@@ -4,6 +4,14 @@
   export let value,
     required = true;
 
+  let textarea;
+
+  function handleKeyDown(event) {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      textarea.blur();
+    }
+  }  
+
   const dispatch = createEventDispatcher();
   let editing = false,
     original;
@@ -19,6 +27,7 @@
   function submit() {
     if (value != original) {
       dispatch("submit", value);
+      
     }
 
     editing = false;
@@ -39,7 +48,17 @@
 
 {#if editing}
   <form on:submit|preventDefault={submit} on:keydown={keydown} class="block">
-    <textarea bind:value on:blur={submit} {required} use:focus class="w-full" autogrow/>
+    <textarea
+      bind:this={textarea}
+      on:keydown={handleKeyDown}
+      class="text-2xl w-full border whitespace-pre border-gray-300 bg-transparent
+      focus:border-blue-500 focus:ring focus:ring-blue-200 p-2 rounded-md outline-none"
+      bind:value
+      on:blur={submit}
+      {required}
+      use:focus
+      autogrow
+    />
   </form>
 {:else}
   <div on:click={edit}>
