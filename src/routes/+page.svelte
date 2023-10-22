@@ -17,6 +17,10 @@
     data = [...data, receivedData];
   });
 
+	// socket.on("edit",(val)=>{	
+	// 	console.log(data)
+	// })
+
   const getTranscript = async () => {
     try {
       const response = await fetch(
@@ -32,8 +36,7 @@
     }
   };
 
-  function updateItem(item) {
-    console.log(item);
+  function updateItem(item) {    
     try {
       fetch(`https://2dvkjqkl-3000.euw.devtunnels.ms/transcribe/${item.id}`, {
         method: "PUT",
@@ -44,16 +47,26 @@
           translated: item.translated,
           original: item.original,
         }),
-      });
+      });			
     } catch (e) {
       console.log(e);
     }
   }
 
   function scrollToBottom() {
-    const page = document.getElementById("page");
-    page.scrollTo(0, page?.scrollHeight || 0);
-    setTimeout(scrollToBottom, 500);
+    const page = document.getElementById("page");		
+		page?.scrollTo(0,page.offsetHeight)    
+  }
+
+	function formatTimestamp(isoTimestamp) {
+    const date = new Date(isoTimestamp);
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      timeZoneName: "short"
+    };
+    return date.toLocaleTimeString(undefined, options);
   }
 
   onMount(async () => {
@@ -61,23 +74,18 @@
     tableSimple = {
       head: ["name", "original", "translated"],
       body: tableMapperValues(data, ["name", "original", "translated"]),
-    };
-		scrollToBottom();
+    };		
   });
 </script>
 
-<div>
-  <!-- {#if tableSimple}
-    <Table source={tableSimple} interactive={true}/>
-  {/if} -->
-
+<div>  
   <div class="container h-full mx-auto flex justify-center items-center">
-    <div class="space-y-10 flex flex-col items-center text-2xl">
-      {#if data}
+    <div class="space-y-10 flex flex-col items-center text-2xl px-8 pb-4 pt-1">
+      {#if data.length !== 0}
         <div>
           {#each data as item (item.id)}
             <p>
-              [{item.name}: {item.timestamp}]
+              [{formatTimestamp(item.timestamp)}: {item.name}]
               <InPlaceEdit
                 class="w-full"
                 bind:value={item.original}
@@ -90,7 +98,7 @@
           {/each}
         </div>
       {:else}
-        <p>No data available.</p>
+        <p>Waiting for session to start...</p>
       {/if}
     </div>
   </div>
